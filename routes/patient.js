@@ -1,4 +1,6 @@
 const express = require('express');
+const { registerPatient , verifyOtp } = require('../controllers/authController');
+
 const router = express.Router();
 
 // Define patient routes
@@ -6,12 +8,11 @@ router.get('/', (req, res) => {
   res.send('List of patients');
 });
 
-router.post('/', (req, res) => {
-  res.send('Add a new patient');
-});
+router.post('/register',registerPatient);
+router.post('/verifyOTP',verifyOtp);
 
 router.get('/:id', (req, res) => {
-  res.send(`Patient details for ID ${req.params.id}`);
+  res.send(`Patient details for ID (${req.params.id})`);
 });
 
 router.put('/:id', (req, res) => {
