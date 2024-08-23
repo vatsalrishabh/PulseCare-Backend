@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerPatient , verifyOtp, loginPatient } = require('../controllers/authController');
+const { registerPatient , verifyOtp, loginPatient, updatePassword, updatePasswordOtp } = require('../controllers/authController');
 
 const router = express.Router();
 
@@ -11,6 +11,8 @@ router.get('/', (req, res) => {
 router.post('/register',registerPatient);
 router.post('/login',loginPatient);
 router.post('/verifyOTP',verifyOtp);
+router.post('/updatePassword',updatePassword);
+router.post('/updatePasswordOtp',updatePasswordOtp);
 
 router.get('/:id', (req, res) => {
   res.send(`Patient details for ID (${req.params.id})`);
