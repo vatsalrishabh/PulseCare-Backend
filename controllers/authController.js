@@ -10,6 +10,9 @@ function generateOtp() {
     return Math.floor(100000 + Math.random() * 900000);
 }
 
+
+// below is the code to register the user 
+
 const registerPatient = async (req, res) => {
     const { name, email, mobile, password, age, sex } = req.body;
 
@@ -41,6 +44,8 @@ const registerPatient = async (req, res) => {
     }
 };
 
+// below is the code to verify the otp
+
 const verifyOtp = async (req, res) => {
     const { email, otp } = req.body;
 
@@ -66,7 +71,32 @@ const verifyOtp = async (req, res) => {
     }
 };
 
+// below is the code to login
+const loginPatient = async (req, res) => {
+    const { patientEmail, patientPassword } = req.body;
+  
+    try {
+      // Find the patient by email
+      const email = patientEmail
+      const patient = await Patient.findOne({ email});
+      if (!patient) {
+        return res.status(404).json({ message: 'User not found.' });
+      }
+  
+      // Check if the password matches
+      if (patient.password !== patientPassword) {
+        return res.status(400).json({ message: 'Incorrect password.' });
+      }
+  
+      return res.status(200).json({ message: 'User Logged In Successfully.', patientDetails: patient });
+    } catch (error) {
+      return res.status(500).json({ message: 'Server error.' });
+    }
+  };
+  
+
 module.exports = {
     registerPatient,
-    verifyOtp
+    verifyOtp,
+    loginPatient
 };

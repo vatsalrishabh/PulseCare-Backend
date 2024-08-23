@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerPatient , verifyOtp } = require('../controllers/authController');
+const { registerPatient , verifyOtp, loginPatient } = require('../controllers/authController');
 
 const router = express.Router();
 
@@ -9,6 +9,7 @@ router.get('/', (req, res) => {
 });
 
 router.post('/register',registerPatient);
+router.post('/login',loginPatient);
 router.post('/verifyOTP',verifyOtp);
 
 router.get('/:id', (req, res) => {
