@@ -1,5 +1,23 @@
 const express = require('express');
+const {
+  registerDoctor,
+  verifyOtp,
+  loginDoctor,
+  updatePassword,
+  updatePasswordOtp
+} = require('../controllers/authDController');
 const router = express.Router();
+
+
+
+// controllers
+router.post('/register',registerDoctor);
+router.post('/login',loginDoctor);
+router.post('/verifyOTP',verifyOtp);
+router.post('/updatePassword',updatePassword);
+router.post('/updatePasswordOtp',updatePasswordOtp);
+
+
 
 // Define doctor routes
 router.get('/', (req, res) => {
