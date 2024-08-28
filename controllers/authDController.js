@@ -75,12 +75,12 @@ const loginDoctor = async (req, res) => {
   
     try {
         const email = doctorEmail;
-        const Doctor = await Doctor.findOne({ email });
-        if (!Doctor) {
+        const doctor = await Doctor.findOne({ email });
+        if (!doctor) {
             return res.status(404).json({ message: 'User not found.' });
         }
   
-        if (Doctor.password !== doctorPassword) {
+        if (doctor.password !== doctorPassword) {
             return res.status(400).json({ message: 'Incorrect password.' });
         }
   
