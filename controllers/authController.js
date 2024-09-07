@@ -2,6 +2,7 @@ const { sendOtpEmail } = require('../utils/mailer');
 const { sendOtpEmailForgot } = require('../utils/forgotOtpmail');
 const Patient = require('../models/Patient');
 const Otp = require('../models/Otp');
+const { makeJwtToken, verifyJwtToken } = require('../service/auth');
 
 const message = "To ensure the security of your account and to complete your registration, please verify your email with the One-Time Password (OTP) provided below.";
 const subject = "Your OTP for PulseCare.";
@@ -69,6 +70,7 @@ const verifyOtp = async (req, res) => {
 // Login Patient
 const loginPatient = async (req, res) => {
     const { patientEmail, patientPassword } = req.body;
+    // console.log(req.body);
   
     try {
         const email = patientEmail;
@@ -80,8 +82,10 @@ const loginPatient = async (req, res) => {
         if (patient.password !== patientPassword) {
             return res.status(400).json({ message: 'Incorrect password.' });
         }
-  
-        return res.status(200).json({ message: 'User Logged In Successfully.', patientDetails: patient });
+    const { mobile} = patient
+       const patientData =  makeJwtToken({email,mobile});
+    //    console.log(patientData);
+        return res.status(200).json({ message: 'User Logged In Successfully.', patientDetails: patientData });
     } catch (error) {
         return res.status(500).json({ message: 'Server error.' });
     }

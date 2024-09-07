@@ -1,5 +1,6 @@
 const express = require('express');
 const { registerPatient , verifyOtp, loginPatient, updatePassword, updatePasswordOtp } = require('../controllers/authController');
+const { jwtMiddleware } = require('../middlewares/jwtmiddleware');
 
 const router = express.Router();
 
@@ -14,7 +15,7 @@ router.post('/verifyOTP',verifyOtp);
 router.post('/updatePassword',updatePassword);
 router.post('/updatePasswordOtp',updatePasswordOtp);
 
-router.get('/:id', (req, res) => {
+router.get('/:id', jwtMiddleware,(req, res) => {
   res.send(`Patient details for ID (${req.params.id})`);
 });
 
