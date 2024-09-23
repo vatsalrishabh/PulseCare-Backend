@@ -1,4 +1,5 @@
 const express = require('express');
+const router = express.Router();
 const {
   registerDoctor,
   verifyOtp,
@@ -6,7 +7,7 @@ const {
   updatePassword,
   updatePasswordOtp
 } = require('../controllers/authDController');
-const router = express.Router();
+
 
 
 
