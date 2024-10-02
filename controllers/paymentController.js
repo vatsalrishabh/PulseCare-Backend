@@ -3,8 +3,8 @@ const { validateWebhookSignature } = require('razorpay/dist/utils/razorpay-utils
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
-  key_id: 'rzp_test_RYNvxWHdirjhUp', // Replace with your Razorpay key_id
-  key_secret: 'FZv0JPK3HyVhoeJnBbXS9wBR', // Replace with your Razorpay key_secret
+  key_id: 'rzp_live_1MxULmQnXguann', // Replace with your Razorpay key_id
+  key_secret: '8WyMGYphteSpi3rBUw6zD8fC', // Replace with your Razorpay key_secret
 });
 
 // Function to create an order
