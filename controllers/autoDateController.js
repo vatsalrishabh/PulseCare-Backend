@@ -10,8 +10,9 @@ const createBookingSlots = () => {
   const endTime = moment().startOf('day').hour(17); // End at 05:00 PM
 
   for (let time = startTime.clone(); time.isBefore(endTime); time.add(45, 'minutes')) {
+    const bookingId = `${moment().format('YY').toUpperCase()}${moment().format('MMM').toUpperCase()}${time.format('DD')}${time.format('HHmmss')}`; // Format bookingId
     slots.push({
-      bookingId: `slot-${time.format('HH:mm')}-${Date.now()}`, // Unique ID for each slot
+      bookingId: bookingId, // New booking ID format
       time: time.format('HH:mm'),
       status: 'available', // Set status to available
       bookedby: 'NA', // Default value
@@ -42,7 +43,7 @@ const createAutoDateRecords = async () => {
       console.log(`Created booking for date: ${formattedDate}`);
     } else {
       console.log(`Booking for date ${formattedDate} already exists. Updating slots...`);
-      
+
       // Optionally, check if slots need to be updated
       const existingSlots = existingBooking.slots;
       const newSlots = createBookingSlots();
