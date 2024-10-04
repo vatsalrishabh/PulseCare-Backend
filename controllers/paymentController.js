@@ -10,8 +10,10 @@ const razorpay = new Razorpay({
 
 // Function to create an order
 const createOrder = async (req, res) => {
+  console.log(req.body+"The create order api is triggered");
   try {
     const { amount, currency, receipt, notes } = req.body;
+    console.log(amount+" "+currency+" "+receipt+" "+notes+" "+"The create order api is triggered");
 
     const options = {
       amount: amount * 100, // Convert amount to paise
