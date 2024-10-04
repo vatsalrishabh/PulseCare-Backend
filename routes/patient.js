@@ -1,6 +1,6 @@
 const express = require('express');
 const { registerPatient , verifyOtp, loginPatient, updatePassword, updatePasswordOtp } = require('../controllers/authController');
-const {getBookings, postBookings} = require('../controllers/datebookings');
+const {getBookings, postBookings,postBookingsAdmin} = require('../controllers/datebookings');
 const {postPatientHistory} = require('../controllers/patientHistory')
 const { jwtMiddleware } = require('../middlewares/jwtmiddleware');
 
@@ -20,9 +20,11 @@ router.post('/updatePasswordOtp',updatePasswordOtp);
 
 router.get('/getBookings',getBookings);  //http://localhost:3000/api/patients/getBookings
 router.post('/postBookings',postBookings);  //http://localhost:3000/api/patients/postBookings
+router.post('/postBookingsAdmin',postBookingsAdmin);  //http://localhost:3000/api/patients/postBookingsAdmin
 
 
-router.post('/postHistory',postPatientHistory);
+
+router.post('/postHistory',postPatientHistory);  //
 // router.get('/:id', jwtMiddleware,(req, res) => {
 //   res.send(`Patient details for ID (${req.params.id})`);
 // });
