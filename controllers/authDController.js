@@ -71,7 +71,7 @@ const verifyOtp = async (req, res) => {
 // Login Doctor
 const loginDoctor = async (req, res) => {
     const { doctorEmail, doctorPassword } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
   
     try {
         const email = doctorEmail;
@@ -83,8 +83,15 @@ const loginDoctor = async (req, res) => {
         if (doctor.password !== doctorPassword) {
             return res.status(400).json({ message: 'Incorrect password.' });
         }
-  
-        return res.status(200).json({ message: 'User Logged In Successfully.', DoctorDetails: Doctor });
+//   console.log(doctor);
+        return res.status(200).json({ message: 'User Logged In Successfully.',  DoctorDetails: { 
+            name: doctor.name,
+            email: doctor.email,
+            mobile: doctor.mobile,
+            age: doctor.age,
+            sex: doctor.sex,
+            license: doctor.license 
+        }});
     } catch (error) {
         return res.status(500).json({ message: 'Server error.' });
     }

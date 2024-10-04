@@ -29,7 +29,7 @@ const registerPatient = async (req, res) => {
         if (!otpDoc) {
             otpDoc = new Otp({ email, otp });
             await otpDoc.save(); // Save the OTP to the database
-            console.log("New OTP generated and sent.");
+            // console.log("New OTP generated and sent.");
         } else {
             console.log("OTP from Otp collection: " + otpDoc.otp);
         }
@@ -82,7 +82,7 @@ const loginPatient = async (req, res) => {
         if (patient.password !== patientPassword) {
             return res.status(400).json({ message: 'Incorrect password.' });
         }
-    const { mobile} = patient
+    const { mobile} = patient;
        const patientData =  makeJwtToken({email,mobile});
     //    console.log(patientData);
         return res.status(200).json({ message: 'User Logged In Successfully.', patientDetails: patientData, email:email,contact:patient.mobile,name:patient.name });
@@ -93,8 +93,10 @@ const loginPatient = async (req, res) => {
 
 // Update Password
 const updatePassword = async (req, res) => {
+  
     const { emailUpdatePassword } = req.body;
     const email = emailUpdatePassword;
+   
 
     try {
         const patientDetails = await Patient.findOne({ email });
@@ -109,10 +111,10 @@ const updatePassword = async (req, res) => {
             const newOtp = new Otp({ email, otp });
             await newOtp.save();
             await sendOtpEmailForgot(email, otp, "OTP to reset your password.", subject);
-            console.log("New OTP generated and sent for password reset.");
+            // console.log("New OTP generated and sent for password reset.");
         } else {
             await sendOtpEmailForgot(email, otp, "OTP to reset your password.", subject);
-            console.log("Existing OTP sent for password reset.");
+            // console.log("Existing OTP sent for password reset.");
         }
 
         return res.status(200).json({ message: "OTP to change password has been sent." });
