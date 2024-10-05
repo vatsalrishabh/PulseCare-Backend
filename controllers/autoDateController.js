@@ -3,14 +3,14 @@ const DateBookings = require('../models/DateBookings'); // Adjust the path as ne
 const moment = require('moment'); // To manage dates easily
 const cron = require('node-cron');
 
-// Function to create booking slots for a date
-const createBookingSlots = () => {
+// Function to create booking slots for a specific date
+const createBookingSlots = (date) => {
   const slots = [];
-  const startTime = moment().startOf('day').hour(9); // Start at 09:00 AM
-  const endTime = moment().startOf('day').hour(17); // End at 05:00 PM
+  const startTime = moment(date).startOf('day').hour(9); // Start at 09:00 AM
+  const endTime = moment(date).startOf('day').hour(17); // End at 05:00 PM
 
   for (let time = startTime.clone(); time.isBefore(endTime); time.add(45, 'minutes')) {
-    const bookingId = `${moment().format('YY').toUpperCase()}${moment().format('MMM').toUpperCase()}${time.format('DD')}${time.format('HHmmss')}`; // Format bookingId
+    const bookingId = `${moment(date).format('YY').toUpperCase()}${moment(date).format('MMM').toUpperCase()}${time.format('DD')}${time.format('HHmm')}`; // Format bookingId
     slots.push({
       bookingId: bookingId, // New booking ID format
       time: time.format('HH:mm'),
@@ -33,7 +33,7 @@ const createAutoDateRecords = async () => {
 
     const existingBooking = await DateBookings.findOne({ date: formattedDate });
     if (!existingBooking) {
-      const slots = createBookingSlots();
+      const slots = createBookingSlots(date); // Pass date to createBookingSlots
       const newBooking = new DateBookings({
         date: formattedDate,
         slots,
@@ -44,11 +44,9 @@ const createAutoDateRecords = async () => {
     } else {
       console.log(`Booking for date ${formattedDate} already exists. Updating slots...`);
 
-      // Optionally, check if slots need to be updated
       const existingSlots = existingBooking.slots;
-      const newSlots = createBookingSlots();
+      const newSlots = createBookingSlots(date); // Pass date to createBookingSlots
 
-      // Find any slots that are not available and update them
       for (const newSlot of newSlots) {
         const slotIndex = existingSlots.findIndex(slot => slot.time === newSlot.time);
         if (slotIndex === -1 || existingSlots[slotIndex].status !== 'available') {

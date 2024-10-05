@@ -46,7 +46,7 @@ const registerPatient = async (req, res) => {
 // Verify OTP
 const verifyOtp = async (req, res) => {
     const { email, otp } = req.body;
-    console.log(req.body)
+  
     try {
         const existingOtp = await Otp.findOne({ email, otp });
         if (existingOtp) {

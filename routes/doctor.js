@@ -5,7 +5,8 @@ const {
   verifyOtp,
   loginDoctor,
   updatePassword,
-  updatePasswordOtp
+  updatePasswordOtp,
+  getAllDoctors
 } = require('../controllers/authDController');
 
 
@@ -21,9 +22,7 @@ router.post('/updatePasswordOtp',updatePasswordOtp);
 
 
 // Define doctor routes
-router.get('/', (req, res) => {
-  res.send('List of doctors');
-});
+router.get('/getAllDoctors', getAllDoctors); //api/doctors/getAllDoctors
 
 router.post('/', (req, res) => {
   res.send('Add a new doctor');

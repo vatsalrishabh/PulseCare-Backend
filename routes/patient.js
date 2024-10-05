@@ -1,12 +1,13 @@
 const express = require('express');
 const { registerPatient , verifyOtp, loginPatient, updatePassword, updatePasswordOtp } = require('../controllers/authController');
 const {getBookings, postBookings,postBookingsAdmin} = require('../controllers/datebookings');
-const {postPatientHistory} = require('../controllers/patientHistory')
+const {postPatientHistory, upcomingBookings } = require('../controllers/patientHistory')
 const { jwtMiddleware } = require('../middlewares/jwtmiddleware');
+const {getAllBookings,prescribeMedecine,oldPrescription} = require('../controllers/prescriptionController');
 
 const router = express.Router();
 
-// Define patient routes
+// Define patient route
 router.get('/', (req, res) => {
   res.send('List of patients');
 });
@@ -24,21 +25,20 @@ router.post('/postBookingsAdmin',postBookingsAdmin);  //http://localhost:3000/ap
 
 
 
-router.post('/postHistory',postPatientHistory);  //
+router.post('/upcomingBookings',upcomingBookings);  //http://localhost:3000/api/patients/upcomingBookings
+router.post('/postHistory',postPatientHistory);  //http://localhost:3000/api/patients/postHistory
+router.post('/prescribeMedecine',prescribeMedecine);  //http://localhost:3000/api/patients/prescribeMedecine
+router.post('/oldPrescription',oldPrescription);  //http://localhost:3000/api/patients/oldPrescription
+
 // router.get('/:id', jwtMiddleware,(req, res) => {
 //   res.send(`Patient details for ID (${req.params.id})`);
 // });
 
-router.put('/:id', (req, res) => {
-  res.send(`Update patient with ID ${req.params.id}`);
-});
-
-router.delete('/:id', (req, res) => {
-  res.send(`Delete patient with ID ${req.params.id}`);
-});
 
 
-// Bookings ROutes
+
+// Prescription ROutes
+router.get('/getAllBookings',getAllBookings); //http://localhost:3000/api/patients/getAllBookings
 
 
 

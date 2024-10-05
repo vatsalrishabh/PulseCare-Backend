@@ -41,6 +41,10 @@ const paymentSchema = new mongoose.Schema({
     type: Object,
     default: {},
   },
+  googleMeet:{
+    type:String,
+    default:"Na",
+  }
 });
 
 const Payment = mongoose.model('Payment', paymentSchema);
