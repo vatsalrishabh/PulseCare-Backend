@@ -1,16 +1,14 @@
 const express = require('express');
 const { registerPatient , verifyOtp, loginPatient, updatePassword, updatePasswordOtp } = require('../controllers/authController');
 const {getBookings, postBookings,postBookingsAdmin} = require('../controllers/datebookings');
-const {postPatientHistory, upcomingBookings } = require('../controllers/patientHistory')
+const {postPatientHistory, getPatientHistory,upcomingBookings,getAllPatients } = require('../controllers/patientHistory')
 const { jwtMiddleware } = require('../middlewares/jwtmiddleware');
 const {getAllBookings,prescribeMedecine,oldPrescription} = require('../controllers/prescriptionController');
 
 const router = express.Router();
 
 // Define patient route
-router.get('/', (req, res) => {
-  res.send('List of patients');
-});
+router.get('/getAllPatients', getAllPatients); //http://localhost:3000/api/patients/getAllPatients
 
 router.post('/register',registerPatient);
 router.post('/login',loginPatient);
@@ -27,6 +25,7 @@ router.post('/postBookingsAdmin',postBookingsAdmin);  //http://localhost:3000/ap
 
 router.post('/upcomingBookings',upcomingBookings);  //http://localhost:3000/api/patients/upcomingBookings
 router.post('/postHistory',postPatientHistory);  //http://localhost:3000/api/patients/postHistory
+router.get('/getPatientHistory/:email',getPatientHistory);  //http://localhost:3000/api/patients/getPatientHistory:
 router.post('/prescribeMedecine',prescribeMedecine);  //http://localhost:3000/api/patients/prescribeMedecine
 router.post('/oldPrescription',oldPrescription);  //http://localhost:3000/api/patients/oldPrescription
 
