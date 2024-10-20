@@ -81,7 +81,7 @@ const upcomingBookings = async (req, res) => {
     const { email } = req.body;
 
     // Step 1: Find payments associated with the provided email
-    const payments = await Payment.find({ "notes.email": email });
+    const payments = await Payment.find({ status: "success", "notes.email": email });
 
     // Check if any payments were found
     if (payments.length === 0) {

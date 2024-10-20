@@ -4,7 +4,7 @@ const {getBookings, postBookings,postBookingsAdmin} = require('../controllers/da
 const {postPatientHistory, getPatientHistory,upcomingBookings,getAllPatients } = require('../controllers/patientHistory')
 const { jwtMiddleware } = require('../middlewares/jwtmiddleware');
 const {getAllBookings,prescribeMedecine,oldPrescription} = require('../controllers/prescriptionController');
-
+const {patientFileUpload,viewUploadedFiles} = require('../controllers/patientUploadFile');
 const router = express.Router();
 
 // Define patient route
@@ -33,6 +33,8 @@ router.post('/oldPrescription',oldPrescription);  //http://localhost:3000/api/pa
 //   res.send(`Patient details for ID (${req.params.id})`);
 // });
 
+router.post('/patientFileUpload',patientFileUpload);  //http://localhost:3000/api/patients/patientFileUpload
+router.get('/viewUploadedFiles',viewUploadedFiles);  //http://localhost:3000/api/patients/viewUploadedFiles
 
 
 

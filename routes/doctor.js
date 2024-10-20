@@ -8,6 +8,8 @@ const {
   updatePasswordOtp,
   getAllDoctors
 } = require('../controllers/authDController');
+const {upcomingBookings,postGoogleMeet}  = require('../controllers/allPatientAppoint');
+
 
 
 
@@ -19,6 +21,9 @@ router.post('/verifyOTP',verifyOtp);
 router.post('/updatePassword',updatePassword);
 router.post('/updatePasswordOtp',updatePasswordOtp);
 
+
+router.post('/getAllBookings',upcomingBookings);  //api/doctors/getAllBookings
+router.post('/postGoogleMeet',postGoogleMeet); //api/doctors/postGoogleMeet
 
 
 // Define doctor routes

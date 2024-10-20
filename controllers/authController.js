@@ -3,6 +3,7 @@ const { sendOtpEmailForgot } = require('../utils/forgotOtpmail');
 const Patient = require('../models/Patient');
 const Otp = require('../models/Otp');
 const { makeJwtToken, verifyJwtToken } = require('../service/auth');
+const {generateUniqueId} = require('../controllers/uniqueIdGenerator');
 
 const message = "To ensure the security of your account and to complete your registration, please verify your email with the One-Time Password (OTP) provided below.";
 const subject = "Your OTP for PulseCare.";
@@ -11,6 +12,7 @@ const subject = "Your OTP for PulseCare.";
 function generateOtp() {
     return Math.floor(100000 + Math.random() * 900000);
 }
+
 
 // Register Patient
 const registerPatient = async (req, res) => {
@@ -51,7 +53,8 @@ const verifyOtp = async (req, res) => {
         const existingOtp = await Otp.findOne({ email, otp });
         if (existingOtp) {
             const { name, mobile, password, age, sex } = req.body;
-            const newPatient = new Patient({ name, email, mobile, password, age, sex });
+            const patientIdFromFun = await generateUniqueId();
+            const newPatient = new Patient({patientId:patientIdFromFun, name, email, mobile, password, age, sex });
             await newPatient.save();
 
             // Optionally, delete the OTP after successful verification

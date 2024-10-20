@@ -1,11 +1,14 @@
 const Razorpay = require('razorpay');
 const { validateWebhookSignature } = require('razorpay/dist/utils/razorpay-utils');
 const Payment = require('../models/Payment');
+const DateBookings = require('../models/DateBookings');
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
-  key_id: 'rzp_live_1MxULmQnXguann', // Replace with your Razorpay key_id
-  key_secret: '8WyMGYphteSpi3rBUw6zD8fC', // Replace with your Razorpay key_secret
+  // key_id: 'rzp_live_1MxULmQnXguann', 
+  // key_secret: '8WyMGYphteSpi3rBUw6zD8fC', 
+  key_id: 'rzp_test_l0gnUnaG8U4VmM', 
+  key_secret: '5ji43g1ji2Hnz1f1DJWpNX4T', 
 });
 
 // Function to create an order
@@ -39,6 +42,45 @@ const createOrder = async (req, res) => {
   }
 };
 
+
+const paymentSuccess = async (req, res) => {
+  // Send HTML content directly
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Payment Success</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                margin: 50px;
+            }
+            .success-message {
+                color: green;
+                font-size: 24px;
+                margin-top: 20px;
+            }
+            .thank-you {
+                font-size: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Payment Successful!</h1>
+        <p class="success-message">Thank you for your payment.</p>
+        <p class="thank-you">Your transaction was completed successfully.</p>
+    </body>
+    </html>
+  `);
+};
+
+
+
+
 // Function to verify payment
 // Function to verify payment
 const verifyPayment = async (req, res) => {
@@ -64,6 +106,21 @@ const verifyPayment = async (req, res) => {
             { razorOrderId: razorpay_order_id },
             { $set: { razorPaymentId: razorpay_payment_id, status: 'success', updatedAt: Date.now() } }
           );
+
+          console.log(+paymentRecord.bookingId);
+          await DateBookings.updateOne(
+            { "slots.bookingId": paymentRecord.bookingId }, // Match the booking date and booking ID
+            {
+              $set: {
+                "slots.$.status": "booked", // Update the status of the matched slot
+                "slots.$.bookedOn": new Date() // Set the booking date to the current date/time
+              }
+            }
+          );
+          
+         
+
+
         }
       }
       res.status(200).json({ status: 'ok' });
@@ -79,8 +136,11 @@ const verifyPayment = async (req, res) => {
 };
 
 
+
+
 // Exporting the functions
 module.exports = {
   createOrder,
   verifyPayment,
+  paymentSuccess,
 };

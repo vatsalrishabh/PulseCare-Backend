@@ -40,9 +40,9 @@ const createAutoDateRecords = async () => {
       });
 
       await newBooking.save();
-      console.log(`Created booking for date: ${formattedDate}`);
+      // console.log(`Created booking for date: ${formattedDate}`);
     } else {
-      console.log(`Booking for date ${formattedDate} already exists. Updating slots...`);
+      // console.log(`Booking for date ${formattedDate} already exists. Updating slots...`);
 
       const existingSlots = existingBooking.slots;
       const newSlots = createBookingSlots(date); // Pass date to createBookingSlots
@@ -55,7 +55,7 @@ const createAutoDateRecords = async () => {
       }
 
       await existingBooking.save(); // Save updates to existing booking
-      console.log(`Updated slots for date: ${formattedDate}`);
+      // console.log(`Updated slots for date: ${formattedDate}`);
     }
   }
 };

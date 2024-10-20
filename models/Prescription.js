@@ -1,27 +1,28 @@
 const mongoose = require('mongoose');
 
-const MedicineSchema = new mongoose.Schema({
-  medicine: { type: String, required: true },
-  dosage: { type: String, required: true },
-  frequency: { type: String, required: true },
-  duration: { type: String, required: true },
-}, { _id: false }); // Disable _id for subdocuments
-
-const PrescriptionSchema = new mongoose.Schema({
-  bookingId: { type: String, required: true },
-  patient: {
-    name: { type: String, required: true },
-    email: { type: String, required: true },
-    contactNumber: { type: String, required: true },
+const prescriptionSchema = new mongoose.Schema({
+  patientId: {
+    type: String,
+    required: true
   },
-  paymentStatus: { type: String, required: true }, // e.g., "Paid", "Pending"
-  amount: { type: Number, required: true },
-  date: { type: Date, required: true, default: Date.now },
-  medicines: [MedicineSchema], // Array of medicine objects
-}, {
-  timestamps: true, // Automatically create createdAt and updatedAt fields
+  bookingId: {
+    type: String,
+    required: true
+  },
+  date: {
+    type: Date,
+    default: Date.now
+  },
+  medicines: [
+    {
+      name: { type: String, required: true },
+      dosage: { type: String, required: true },
+      frequency: { type: String, required: true },
+      duration: { type: String, required: true },
+      prescriptionFile: { type: String}  // Path to the prescription file
+    }
+  ]
 });
 
-const Prescription = mongoose.model('Prescription', PrescriptionSchema);
-
-module.exports = Prescription;
+// Exporting the Prescription model
+module.exports = mongoose.model('Prescription', prescriptionSchema);
