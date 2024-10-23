@@ -83,6 +83,63 @@ const getAllBookings = async (req, res) => {
 };
 
 
+const recommendTest = async (req, res) => {
+  const { bookingId, patientId, test } = req.body;
+  try {
+    const updatedPrescription = await Prescription.updateOne(
+      { bookingId: bookingId },
+      { $push: { recommendedTest: test } },  // Add test to recommendedTest array
+      { upsert: true }  // This will insert a new document if no matching document is found
+    );
+    if (updatedPrescription) {
+      return res.status(201).json({ message: 'New prescription created and test added!' });
+    } else if (updatedPrescription.nModified > 0) {
+      return res.status(200).json({ message: 'Test added successfully!' });
+    } else {
+      return res.status(404).json({ message: 'No changes were made' });
+    }
+  } catch (error) {
+    console.error('Error recommending test:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const deleteTest = async (req, res) => {
+  const { bookingId, patientId, testId } = req.body;
+  try {
+    const updatedPrescription = await Prescription.updateOne(
+      { bookingId: bookingId },
+      { $pull: { recommendedTest: { _id: testId } } } // Remove test from recommendedTest array
+    );
+
+    if (updatedPrescription.nModified > 0) {
+      return res.status(200).json({ message: 'Test deleted successfully!' });
+    } else {
+      return res.status(404).json({ message: 'Test not found or no changes were made' });
+    }
+  } catch (error) {
+    console.error('Error deleting test:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+const viewRecommendedTest = async (req, res) => {
+  const { bookingId, patientId } = req.query;
+
+  try {
+    const prescription = await Prescription.findOne({ bookingId: bookingId, patientId: patientId });
+
+    if (prescription) {
+      return res.status(200).json(prescription.recommendedTest);
+    } else {
+      return res.status(404).json({ message: 'No prescription found for the given details' });
+    }
+  } catch (error) {
+    console.error('Error fetching recommended tests:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
 
 
@@ -158,10 +215,54 @@ const oldPrescription = async (req, res) => {
 };
 
 
+const PatientOldPrescription = async (req, res) => {
+  try {
+    const { patientEmail } = req.body; // Correct the spelling of patientEmail
+  
+
+    // Find the patient by email to get their patient ID
+    const patient = await Patient.findOne({ email: patientEmail });
+
+    // If the patient is not found, return a 404 error
+    if (!patient) {
+      return res.status(404).json({ message: 'Patient not found.' });
+    }
+
+
+
+    // Use patientId to find related prescriptions
+    const result = await Prescription.find({ patientId: patient.patientId });
+
+  
+
+    // Check if any prescriptions were found for the given patient
+    if (result.length === 0) {
+      return res.status(404).json({ message: 'No prescriptions found for this patient.' });
+    }
+
+    // Respond with the found prescriptions
+    res.status(200).json(result);
+  } catch (error) {
+    // Error handling for issues in retrieving prescriptions
+    res.status(500).json({
+      message: 'Error retrieving prescriptions',
+      error: error.message,
+    });
+  }
+};
+
+
+
+
+
 
 
 module.exports = {
   getAllBookings,
   prescribeMedecine,
   oldPrescription,
+  PatientOldPrescription,
+  recommendTest,
+  viewRecommendedTest,
+  deleteTest,
 };

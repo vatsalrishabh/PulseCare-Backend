@@ -19,7 +19,13 @@ const prescriptionSchema = new mongoose.Schema({
       dosage: { type: String, required: true },
       frequency: { type: String, required: true },
       duration: { type: String, required: true },
-      prescriptionFile: { type: String}  // Path to the prescription file
+      prescriptionFile: { type: String }  
+    }
+  ],
+  recommendedTest: [
+    {
+      name: { type: String, required: true },
+      date: { type: String }  // Test date field to track when the test was added
     }
   ]
 });
