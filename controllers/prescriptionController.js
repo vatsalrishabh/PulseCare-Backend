@@ -5,6 +5,7 @@ const Patient = require('../models/Patient');
 
 
 
+
 const getPatientId = async (req, res) => {
   const { email } = req.query;
  
@@ -253,6 +254,65 @@ const oldPrescription = async (req, res) => {
   }
 };
 
+// Controller to handle patient complaints
+const patientComplaint = async (req, res) => {
+  const { patientId, bookingId, complaint } = req.body;
+
+  try {
+    // Check if a Prescription document exists for the given patientId and bookingId
+    let prescription = await Prescription.findOne({ patientId, bookingId });
+
+    if (prescription) {
+      // If exists, update the patientComplaint field
+      prescription.patientComplaint.push({ Complaint: complaint });
+      await prescription.save();
+    } else {
+      // If not, create a new Prescription document with the complaint
+      prescription = new Prescription({
+        patientId,
+        bookingId,
+        patientComplaint: [{ Complaint: complaint }]
+      });
+      await prescription.save();
+    }
+
+    res.status(200).json({ message: 'Complaint added successfully', prescription });
+  } catch (error) {
+    console.error("Error saving complaint:", error);
+    res.status(500).json({ message: 'Error saving complaint', error });
+  }
+};
+
+const sendDiagnosis = async (req, res) => {
+  const { patientId, bookingId, diagnosis, notes } = req.body;
+
+  try {
+    // Find the existing Prescription document based on patientId and bookingId
+    let prescription = await Prescription.findOne({ patientId, bookingId });
+
+    if (prescription) {
+      // If the document exists, add the diagnosis to the DoctorDiagnosis array
+      prescription.DoctorDiagnosis.push({ Diagnosis: diagnosis, Notes: notes });
+      await prescription.save();
+    } else {
+      // If it doesn't exist, create a new Prescription document with the DoctorDiagnosis array
+      prescription = new Prescription({
+        patientId,
+        bookingId,
+        DoctorDiagnosis: [{ Diagnosis: diagnosis, Notes: notes }]
+      });
+      await prescription.save();
+    }
+
+    res.status(200).json({ message: 'Diagnosis added successfully', prescription });
+  } catch (error) {
+    console.error("Error saving diagnosis:", error);
+    res.status(500).json({ message: 'Error saving diagnosis', error });
+  }
+};
+
+
+
 
 const PatientOldPrescription = async (req, res) => {
   try {
@@ -293,6 +353,62 @@ const PatientOldPrescription = async (req, res) => {
 
 
 
+const fetchAllPrescriptionDetails = async (req, res) => {
+  const { email, bookingId } = req.query;
+
+  try {
+    // Fetch patient details
+    const patient = await Patient.findOne({ email });
+    // Fetch prescription details
+    const prescriptions = await Prescription.find({ bookingId });
+
+    if (!patient || prescriptions.length === 0) {
+      return res.status(404).json({ message: "Patient or prescriptions not found" });
+    }
+
+    // Prepare the response data
+    const prescriptionDetails = {
+      patientDetails: {
+        name: patient.name,
+        number: patient.mobile,
+        email: patient.email,
+        address: "N/A", // Include any additional fields as necessary
+        age: patient.age,
+        sex: patient.sex,
+        weight: "N/A",
+        bloodPressure: "N/A",
+        height: "N/A",
+      },
+      medicines: prescriptions.flatMap(p => p.medicines),
+      recommendedTests: prescriptions.flatMap(p => p.recommendedTest || []), // Get recommended tests
+      doctorDetails: {
+        doctorName: "Dr. Nishant Kumar",
+        doctorLicense: "TNMC161353",
+        degree: "MBBS",
+      },
+      patientComplaints: prescriptions.flatMap(p => p.patientComplaint.length > 0 ? p.patientComplaint : [{ Complaint: "N/A" }]),
+      doctorDiagnoses: prescriptions.flatMap(p => p.DoctorDiagnosis.length > 0 ? p.DoctorDiagnosis : [{ Diagnosis: "N/A" }]),
+    };
+
+    // If no complaints, set to "N/A"
+    if (prescriptionDetails.patientComplaints.length === 0) {
+      prescriptionDetails.patientComplaints = [{ Complaint: "N/A" }];
+    }
+
+    // If no diagnoses, set to "N/A"
+    if (prescriptionDetails.doctorDiagnoses.length === 0) {
+      prescriptionDetails.doctorDiagnoses = [{ Diagnosis: "N/A" }];
+    }
+
+    return res.json(prescriptionDetails);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+
 
 
 
@@ -305,4 +421,7 @@ module.exports = {
   viewRecommendedTest,
   deleteTest,
   getPatientId,
+  fetchAllPrescriptionDetails,
+  patientComplaint,
+  sendDiagnosis,
 };

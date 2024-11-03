@@ -27,6 +27,14 @@ const prescriptionSchema = new mongoose.Schema({
       name: { type: String, required: true },
       date: { type: String }  // Test date field to track when the test was added
     }
+  ], patientComplaint: [
+    {
+      Complaint:String,
+    }
+  ], DoctorDiagnosis: [
+    {
+      Diagnosis:String,
+    }
   ]
 });
 
