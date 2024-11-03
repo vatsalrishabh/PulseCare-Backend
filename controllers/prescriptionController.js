@@ -3,6 +3,42 @@ const DateBookings = require('../models/DateBookings');
 const Prescription = require('../models/Prescription');
 const Patient = require('../models/Patient');
 
+
+
+const getPatientId = async (req, res) => {
+  const { email } = req.query;
+ 
+
+  try {
+    // Step 1: Find the patient by email
+    const patient = await Patient.findOne({ email });
+
+    // Check if the patient was found
+    if (!patient) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    const patientId = patient.patientId;
+
+    // Step 2: Find the prescription by patientId to get the bookingId
+    const prescription = await Prescription.findOne({ patientId });
+
+    // Check if a prescription was found for the patient
+    if (!prescription) {
+      return res.status(404).json({ message: 'Prescription not found for this patient' });
+    }
+
+    const bookingId = prescription.bookingId;
+
+    // Send both patientId and bookingId as the response
+    res.status(200).json({ patientId, bookingId });
+
+  } catch (error) {
+    console.error('Error fetching patient and booking ID:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 const getAllBookings = async (req, res) => {
   try {
     const { status } = req.query; // Accept status as a query parameter
@@ -75,6 +111,7 @@ const getAllBookings = async (req, res) => {
     // console.log(mergedBookings);  Log mergedBookings for debugging before sending the response
 
     // Send the merged data as a response
+
     res.status(200).json(mergedBookings);
   } catch (error) {
     console.error('Error fetching bookings:', error);
@@ -85,6 +122,7 @@ const getAllBookings = async (req, res) => {
 
 const recommendTest = async (req, res) => {
   const { bookingId, patientId, test } = req.body;
+  console.log(req.body)
   try {
     const updatedPrescription = await Prescription.updateOne(
       { bookingId: bookingId },
@@ -126,6 +164,7 @@ const deleteTest = async (req, res) => {
 
 const viewRecommendedTest = async (req, res) => {
   const { bookingId, patientId } = req.query;
+  console.log(req.query);
 
   try {
     const prescription = await Prescription.findOne({ bookingId: bookingId, patientId: patientId });
@@ -265,4 +304,5 @@ module.exports = {
   recommendTest,
   viewRecommendedTest,
   deleteTest,
+  getPatientId,
 };

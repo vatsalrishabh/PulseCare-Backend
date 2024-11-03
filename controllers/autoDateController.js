@@ -6,10 +6,10 @@ const cron = require('node-cron');
 // Function to create booking slots for a specific date
 const createBookingSlots = (date) => {
   const slots = [];
-  const startTime = moment(date).startOf('day').hour(9); // Start at 09:00 AM
-  const endTime = moment(date).startOf('day').hour(17); // End at 05:00 PM
+  const startTime = moment(date).startOf('day').hour(0); // Start at 12:00 AM on the given date
+  const endTime = moment(date).endOf('day').hour(23).minute(30); // End at 11:30 PM on the same day
 
-  for (let time = startTime.clone(); time.isBefore(endTime); time.add(45, 'minutes')) {
+  for (let time = startTime.clone(); time.isBefore(endTime); time.add(30, 'minutes')) {
     const bookingId = `${moment(date).format('YY').toUpperCase()}${moment(date).format('MMM').toUpperCase()}${time.format('DD')}${time.format('HHmm')}`; // Format bookingId
     slots.push({
       bookingId: bookingId, // New booking ID format

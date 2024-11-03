@@ -3,12 +3,13 @@ const { registerPatient , verifyOtp, loginPatient, updatePassword, updatePasswor
 const {getBookings, postBookings,postBookingsAdmin} = require('../controllers/datebookings');
 const {postPatientHistory, getPatientHistory,upcomingBookings,getAllPatients } = require('../controllers/patientHistory')
 const { jwtMiddleware } = require('../middlewares/jwtmiddleware');
-const {getAllBookings,prescribeMedecine,oldPrescription,PatientOldPrescription, viewRecommendedTest,recommendTest, deleteTest} = require('../controllers/prescriptionController');
+const {getAllBookings,prescribeMedecine,oldPrescription,PatientOldPrescription, viewRecommendedTest,recommendTest, deleteTest, getPatientId} = require('../controllers/prescriptionController');
 const {patientFileUpload,viewUploadedFiles} = require('../controllers/patientUploadFile');
 const router = express.Router();
 
 // Define patient route
 router.get('/getAllPatients', getAllPatients); //http://localhost:3000/api/patients/getAllPatients
+router.get('/getPatientId',getPatientId); //http://localhost:3000/api/patients/getPatientId
 
 router.post('/register',registerPatient);
 router.post('/login',loginPatient);
