@@ -88,7 +88,6 @@ const loginPatient = async (req, res) => {
     const { mobile} = patient;
        const patientData =  makeJwtToken({email,mobile});
     //    console.log(patientData);
-    console.log(patient.patientId )
         return res.status(200).json({ message: 'User Logged In Successfully.', patientDetails: patientData, email:email,contact:patient.mobile,name:patient.name,patientId:patient.patientId });
     } catch (error) {
         return res.status(500).json({ message: 'Server error.' });

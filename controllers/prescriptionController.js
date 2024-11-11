@@ -259,7 +259,6 @@ const patientComplaint = async (req, res) => {
   const { patientId, bookingId, complaint } = req.body;
 
   try {
-    // Check if a Prescription document exists for the given patientId and bookingId
     let prescription = await Prescription.findOne({ patientId, bookingId });
 
     if (prescription) {
@@ -282,6 +281,26 @@ const patientComplaint = async (req, res) => {
     res.status(500).json({ message: 'Error saving complaint', error });
   }
 };
+
+
+const getPatientComplaint = async (req, res) => {
+  const { patientId, bookingId } = req.query;  // Use req.query for query parameters
+  console.log(req.query);
+  try {
+      let prescription = await Prescription.findOne({ patientId, bookingId });
+      if (prescription) {
+          res.status(200).json({ message: 'Patient Complaint', data: prescription.patientComplaint });
+      } else {
+          res.status(404).json({ message: 'Prescription not found' });
+      }
+  } catch (error) {
+      console.error("Error retrieving complaint:", error);
+      res.status(500).json({ message: 'Error retrieving complaint', error });
+  }
+};
+
+
+
 
 const sendDiagnosis = async (req, res) => {
   const { patientId, bookingId, diagnosis, notes } = req.body;
@@ -423,5 +442,6 @@ module.exports = {
   getPatientId,
   fetchAllPrescriptionDetails,
   patientComplaint,
+  getPatientComplaint,
   sendDiagnosis,
 };
