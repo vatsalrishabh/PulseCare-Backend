@@ -1,6 +1,7 @@
 const Payment = require("../models/Payment");
 const DateBookings = require("../models/DateBookings"); // Ensure this is imported
 const Patient = require("../models/Patient");
+const { sendConsultationEmail} = require("../utils/sendGoogleLink");
 
 const upcomingBookings = async (req, res) => {
     try {
@@ -101,7 +102,7 @@ const upcomingBookings = async (req, res) => {
 
 
 const postGoogleMeet = async (req, res) => {
-    const { bookingId, googlemeetlink } = req.body;
+    const { bookingId, googlemeetlink, patientId, patientName, patientEmail, patientContact } = req.body;
 
     try {
         // Step 1: Update the Payment document with the provided googlemeetlink
@@ -115,11 +116,14 @@ const postGoogleMeet = async (req, res) => {
             return res.status(404).json({ message: 'Booking not found or no changes made.' });
         }
 
-        // Step 3: Send a success response
-        res.status(200).json({ message: 'Google Meet link updated successfully.' });
+        // Step 3: Send email to the patient with the Google Meet link
+        await sendConsultationEmail(patientEmail, googlemeetlink, patientName);
+
+        // Step 4: Send a success response
+        res.status(200).json({ message: 'Google Meet link updated and email sent successfully.' });
     } catch (error) {
         console.error("Error updating Google Meet link:", error);
-        res.status(500).json({ message: 'Error updating Google Meet link', error });
+        res.status(500).json({ message: 'Error updating Google Meet link and sending email', error });
     }
 };
 
