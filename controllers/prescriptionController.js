@@ -123,7 +123,7 @@ const getAllBookings = async (req, res) => {
 
 const recommendTest = async (req, res) => {
   const { bookingId, patientId, test } = req.body;
-  console.log(req.body)
+
   try {
     const updatedPrescription = await Prescription.updateOne(
       { bookingId: bookingId },
@@ -144,11 +144,12 @@ const recommendTest = async (req, res) => {
 };
 
 const deleteTest = async (req, res) => {
-  const { bookingId, patientId, testId } = req.body;
+  const { bookingId, testId } = req.body;
+
   try {
     const updatedPrescription = await Prescription.updateOne(
       { bookingId: bookingId },
-      { $pull: { recommendedTest: { _id: testId } } } // Remove test from recommendedTest array
+      { $pull: { recommendedTest: { _id: testId } } } // Remove test with specific _id from recommendedTest array
     );
 
     if (updatedPrescription.nModified > 0) {
@@ -163,9 +164,10 @@ const deleteTest = async (req, res) => {
 };
 
 
+
 const viewRecommendedTest = async (req, res) => {
   const { bookingId, patientId } = req.query;
-  console.log(req.query);
+
 
   try {
     const prescription = await Prescription.findOne({ bookingId: bookingId, patientId: patientId });
@@ -184,7 +186,7 @@ const viewRecommendedTest = async (req, res) => {
 
 
 const prescribeMedecine = async (req, res) => {
-  console.log(req.body); // Debugging output to log the incoming request body
+// Debugging output to log the incoming request body
   try {
     // Check if a prescription with the same bookingId already exists
     const existingPrescription = await Prescription.findOne({ bookingId: req.body.bookingId });
@@ -229,7 +231,7 @@ const prescribeMedecine = async (req, res) => {
 
 // Function to retrieve old prescriptions based on bookingId
 const oldPrescription = async (req, res) => {
-  console.log(req.body); // Debugging output to log the incoming request body
+ // Debugging output to log the incoming request body
   try {
     const { bookingId } = req.body; // Destructure bookingId from the request body
 
@@ -261,21 +263,16 @@ const patientComplaint = async (req, res) => {
   try {
     let prescription = await Prescription.findOne({ patientId, bookingId });
 
-    if (prescription) {
-      // If exists, update the patientComplaint field
-      prescription.patientComplaint.push({ Complaint: complaint });
-      await prescription.save();
-    } else {
-      // If not, create a new Prescription document with the complaint
-      prescription = new Prescription({
-        patientId,
-        bookingId,
-        patientComplaint: [{ Complaint: complaint }]
-      });
-      await prescription.save();
-    }
+    await Prescription.updateOne(
+      { patientId, bookingId },  // Filter condition to find the correct document
+      { $set: { "patientComplaint": [{ Complaint: complaint }] } },  // Set or update the patientComplaint field
+      { upsert: true }  // If no document matches, create a new one
+    );
 
-    res.status(200).json({ message: 'Complaint added successfully', prescription });
+    res.status(200).json({ message: 'Complaint added/updated successfully' });
+    
+
+    // res.status(200).json({ message: 'Complaint added successfully', prescription });
   } catch (error) {
     console.error("Error saving complaint:", error);
     res.status(500).json({ message: 'Error saving complaint', error });
@@ -285,7 +282,7 @@ const patientComplaint = async (req, res) => {
 
 const getPatientComplaint = async (req, res) => {
   const { patientId, bookingId } = req.query;  // Use req.query for query parameters
-  console.log(req.query);
+
   try {
       let prescription = await Prescription.findOne({ patientId, bookingId });
       if (prescription) {
@@ -303,30 +300,35 @@ const getPatientComplaint = async (req, res) => {
 
 
 const sendDiagnosis = async (req, res) => {
-  const { patientId, bookingId, diagnosis, notes } = req.body;
+
+  const { patientId, bookingId, diagnosis } = req.body;
 
   try {
-    // Find the existing Prescription document based on patientId and bookingId
-    let prescription = await Prescription.findOne({ patientId, bookingId });
+    await Prescription.updateOne(
+      { patientId, bookingId },
+      {
+        $set: { DoctorDiagnosis: { Diagnosis: diagnosis } }
+      },
+      { upsert: true }
+    );
 
-    if (prescription) {
-      // If the document exists, add the diagnosis to the DoctorDiagnosis array
-      prescription.DoctorDiagnosis.push({ Diagnosis: diagnosis, Notes: notes });
-      await prescription.save();
-    } else {
-      // If it doesn't exist, create a new Prescription document with the DoctorDiagnosis array
-      prescription = new Prescription({
-        patientId,
-        bookingId,
-        DoctorDiagnosis: [{ Diagnosis: diagnosis, Notes: notes }]
-      });
-      await prescription.save();
-    }
-
-    res.status(200).json({ message: 'Diagnosis added successfully', prescription });
+    res.status(200).json({ message: 'Diagnosis added successfully' });
   } catch (error) {
     console.error("Error saving diagnosis:", error);
     res.status(500).json({ message: 'Error saving diagnosis', error });
+  }
+};
+
+// Get Diagnosis function to retrieve existing diagnoses
+const getDiagnosis = async (req, res) => {
+  const { patientId, bookingId } = req.query;
+
+  try {
+    const prescription = await Prescription.findOne({ patientId, bookingId }, 'DoctorDiagnosis');
+    res.status(200).json(prescription ? prescription.DoctorDiagnosis : []);
+  } catch (error) {
+    console.error("Error fetching diagnosis:", error);
+    res.status(500).json({ message: 'Error fetching diagnosis', error });
   }
 };
 
@@ -373,56 +375,61 @@ const PatientOldPrescription = async (req, res) => {
 
 
 const fetchAllPrescriptionDetails = async (req, res) => {
-  const { email, bookingId } = req.query;
+ // Log the query params for debugging
+
+  const { email, bookingId } = req.query;  // Extract email and bookingId from the query parameters
 
   try {
-    // Fetch patient details
+    // Fetch patient details based on email
     const patient = await Patient.findOne({ email });
-    // Fetch prescription details
+
+    // Fetch all prescription details based on bookingId
     const prescriptions = await Prescription.find({ bookingId });
 
+    // Check if patient or prescriptions are not found
     if (!patient || prescriptions.length === 0) {
       return res.status(404).json({ message: "Patient or prescriptions not found" });
     }
 
-    // Prepare the response data
+    // Prepare the response data, including patient and prescription details
     const prescriptionDetails = {
       patientDetails: {
         name: patient.name,
         number: patient.mobile,
         email: patient.email,
-        address: "N/A", // Include any additional fields as necessary
+        address: "N/A", // Placeholder for additional patient information
         age: patient.age,
         sex: patient.sex,
-        weight: "N/A",
-        bloodPressure: "N/A",
-        height: "N/A",
+        weight: "N/A",  // Placeholder for additional patient information
+        bloodPressure: "N/A", // Placeholder for additional patient information
+        height: "N/A", // Placeholder for additional patient information
       },
-      medicines: prescriptions.flatMap(p => p.medicines),
-      recommendedTests: prescriptions.flatMap(p => p.recommendedTest || []), // Get recommended tests
+      medicines: prescriptions.flatMap(p => p.medicines),  // Flatten medicines array from all prescriptions
+      recommendedTests: prescriptions.flatMap(p => p.recommendedTest || []),  // Flatten recommended tests array
       doctorDetails: {
-        doctorName: "Dr. Nishant Kumar",
-        doctorLicense: "TNMC161353",
-        degree: "MBBS",
+        doctorName: "Dr. Nishant Kumar",  // Static doctor details (can be dynamic if needed)
+        doctorLicense: "TNMC161353",  // Static doctor license number
+        degree: "MBBS",  // Static doctor degree
       },
-      patientComplaints: prescriptions.flatMap(p => p.patientComplaint.length > 0 ? p.patientComplaint : [{ Complaint: "N/A" }]),
-      doctorDiagnoses: prescriptions.flatMap(p => p.DoctorDiagnosis.length > 0 ? p.DoctorDiagnosis : [{ Diagnosis: "N/A" }]),
+      patientComplaints: prescriptions.flatMap(p => p.patientComplaint.length > 0 ? p.patientComplaint : [{ Complaint: "N/A" }]),  // Default to "N/A" if no complaints are found
+      doctorDiagnoses: prescriptions.flatMap(p => p.DoctorDiagnosis.length > 0 ? p.DoctorDiagnosis : [{ Diagnosis: "N/A" }]),  // Default to "N/A" if no diagnoses are found
     };
 
-    // If no complaints, set to "N/A"
+    // If no complaints are found, set to "N/A"
     if (prescriptionDetails.patientComplaints.length === 0) {
       prescriptionDetails.patientComplaints = [{ Complaint: "N/A" }];
     }
 
-    // If no diagnoses, set to "N/A"
+    // If no diagnoses are found, set to "N/A"
     if (prescriptionDetails.doctorDiagnoses.length === 0) {
       prescriptionDetails.doctorDiagnoses = [{ Diagnosis: "N/A" }];
     }
 
+    // Return the prescription details in the response
     return res.json(prescriptionDetails);
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    console.error(error);  // Log the error for debugging
+    return res.status(500).json({ message: "Internal Server Error" });  // Return 500 status in case of error
   }
 };
 
@@ -444,4 +451,5 @@ module.exports = {
   patientComplaint,
   getPatientComplaint,
   sendDiagnosis,
+  getDiagnosis,
 };
