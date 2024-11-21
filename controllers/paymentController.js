@@ -5,10 +5,10 @@ const DateBookings = require('../models/DateBookings');
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
-  // key_id: 'rzp_live_1MxULmQnXguann', 
-  // key_secret: '8WyMGYphteSpi3rBUw6zD8fC', 
-  key_id: 'rzp_test_l0gnUnaG8U4VmM', 
-  key_secret: '5ji43g1ji2Hnz1f1DJWpNX4T', 
+  key_id: 'rzp_live_1MxULmQnXguann', 
+  key_secret: '8WyMGYphteSpi3rBUw6zD8fC', 
+  // key_id: 'rzp_test_l0gnUnaG8U4VmM', 
+  // key_secret: '5ji43g1ji2Hnz1f1DJWpNX4T', 
 });
 
 // Function to create an order
