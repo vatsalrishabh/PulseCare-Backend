@@ -19,7 +19,9 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow these HTTP methods
   allowedHeaders: ['Content-Type'], // Allow these headers
 }));
-app.use(express.static(path.join(__dirname, 'uploads')));
+
+
+app.use('/uploads',express.static(path.join(__dirname, 'uploads')));
 
 
 // Patient routes
